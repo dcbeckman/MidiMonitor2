@@ -155,8 +155,9 @@ MidiMonitorApp::MessageReceived ( BMessage *msg )
 
 
 
-main ( ) {
+int main ( void ) {
 	MidiMonitorApp	app;
 	app.Run();
+	return 0;
 }
 	
