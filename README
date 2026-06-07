@@ -1,0 +1,34 @@
+MidiMonitor 1.0
+by Bill Thibault
+Tebo Software
+http://www.idiom.com/~tebo/
+
+MidiMonitor displays incoming MIDI messages.
+The user can select which physical MIDI input port to monitor.
+Source code is provided under the Discordian License (All Rights Reversed).
+R4 BeIDE projects for both PPC and Intel are included, as are
+binaries ("MidiMonitor" for PPC, "MidiMonitor-x86" for Intel). 
+
+The color used to display a message is based on the
+"age" of the message: new messages in bright green,
+old messages in black. As messages age the color 
+fades to black: often just seeing the flash of
+an arriving message (from across the room, for example)
+is enough information to make the user happy.
+
+The window is fully resizable (based on William Adams' original
+Calendar example).  
+
+The code is not especially efficient, but will handle the
+densest MIDI streams without being swamped. The incoming
+MIDI stream is sampled at the "Pulse" rate (20 Hz).
+Only the most recent message is displayed.
+
+The current (R4) MidiKit doesn't support sharing of MIDI ports,
+so you'll get unpredictable results if you run MidiMonitor
+on a port that's in use by another app.  If the other app
+is your own, you can use the code to instantiate a BMidi-derived
+MidiMonitor object and M2BView and Connect() it to whatever you want to watch. 
+
+Oakland, CA
+January 1999
