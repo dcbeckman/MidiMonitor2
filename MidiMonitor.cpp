@@ -10,7 +10,7 @@
 #include "MidiMonitor.h"
 
 M2BMidiMonitor::M2BMidiMonitor ( void )
-	: BMidiLocalConsumer ( "MidiMonitor" )
+	: BMidiLocalConsumer ( "MidiMonitor2" )
 {
 	lastSeen[CHANNEL_PRESSURE] = 
 		new M2BMidiLastSeenEntry ( "ChannelPressure", "pressure", "" );

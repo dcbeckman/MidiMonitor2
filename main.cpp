@@ -13,6 +13,7 @@
 #include <Alert.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <Messenger.h>
 #include <string.h>
 #include <stdio.h>
 #include "MidiMonitor.h"
@@ -26,20 +27,21 @@ class MidiMonitorApp : public BApplication {
 				~MidiMonitorApp ( void );
 		virtual void MessageReceived ( BMessage *msg );
 	private:
+		void         _RebuildPortMenu ( void );
+		BMenu        *fPortMenu;
 		BMidiProducer	*connectedProducer;
 		M2BMidiMonitor	*theMidiMonitor;
 };
 
 #define MSG_MIDIMONITOR_MIDI_PORT 'BUmp'
 
-MidiMonitorApp::MidiMonitorApp ( void ) 
+MidiMonitorApp::MidiMonitorApp ( void )
 	: BApplication ("application/x-vnd.dcbeckman-midimonitor2")
 {
 	BRect aRect;
 	BList windows;
 	const float menuHeight = 20;
-	int	initPort = 0; // default initial port index to select
-	
+
 	connectedProducer = NULL;
 	theMidiMonitor = new M2BMidiMonitor ();
 	theMidiMonitor->Register();
@@ -47,7 +49,7 @@ MidiMonitorApp::MidiMonitorApp ( void )
 	aRect.Set(20, 100, 340, 400);
 	BWindow *aWindow = (BWindow *) new M2BWindow(aRect);
 	aRect.OffsetTo(B_ORIGIN);
-	BView *aView = (BView *) new M2BView(aRect, "M2BView", 
+	BView *aView = (BView *) new M2BView(aRect, "M2BView",
 					(M2BMidiMonitor*)theMidiMonitor, menuHeight);
 	aWindow->AddChild(aView);
 	aWindow->Show();
@@ -57,68 +59,103 @@ MidiMonitorApp::MidiMonitorApp ( void )
 	BMenuBar	*menubar = new BMenuBar ( aRect, "menubar" );
 	menubar->SetBorder ( B_BORDER_FRAME );
 
-	BMenuItem *item; 
-	BMenu *menu = new BMenu("File"); 
-
-	item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'); 
-	item->SetTarget(be_app); 
-	menu->AddItem(item); 
-
-	menubar->AddItem ( menu );
-	
-	// add the port selection menu
-	menu = new BMenu ( "Port" );
-	
-	int32 id = 0;
-	int32 count = 0;
-	BMidiProducer *prod;
-	while ((prod = BMidiRoster::NextProducer(&id)) != NULL) {
-		item = new BMenuItem ( prod->Name(), 
-								new BMessage ( MSG_MIDIMONITOR_MIDI_PORT ) );
-		item->Message()->AddInt32 ( "port_id", prod->ID() );
-		menu->AddItem ( item );
-		
-		if (count == initPort) {
-			connectedProducer = prod;
-			connectedProducer->Acquire();
-		}
-		
-		prod->Release();
-		count++;
-	}
-
-	if (count == 0) {
-		item = new BMenuItem("No ports found", NULL);
-		item->SetEnabled(false);
-		menu->AddItem(item);
-	} else {
-		menu->SetRadioMode ( TRUE );
-		if (menu->ItemAt(initPort) != NULL) {
-			menu->ItemAt(initPort)->SetMarked ( TRUE );
-		}
-		menu->SetTargetForItems ( be_app );	
-	}
-	
+	BMenuItem *item;
+	BMenu *menu = new BMenu("File");
+	item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q');
+	item->SetTarget(be_app);
+	menu->AddItem(item);
 	menubar->AddItem ( menu );
 
-	if (connectedProducer != NULL) {
-		connectedProducer->Connect(theMidiMonitor);
-	}
-
+	fPortMenu = new BMenu ( "Port" );
+	menubar->AddItem ( fPortMenu );
 	aView->AddChild ( menubar );
+
+	_RebuildPortMenu();
+
+	// Watch for endpoints being added/removed so the Port menu stays current
+	BMessenger me(this);
+	BMidiRoster::StartWatching(&me);
 }
 
 
 MidiMonitorApp::~MidiMonitorApp ( void )
 {
+	BMessenger me(this);
+	BMidiRoster::StopWatching(&me);
+
 	if (connectedProducer != NULL) {
 		connectedProducer->Disconnect(theMidiMonitor);
 		connectedProducer->Release();
+		connectedProducer = NULL;
 	}
-	theMidiMonitor->Unregister();
+	// Release() automatically unregisters — do NOT call Unregister() before
+	// Release() or the endpoint refcount double-dips and the destructor fires
+	// debugger("you should use Release()...").
 	theMidiMonitor->Release();
 }
 
+
+void
+MidiMonitorApp::_RebuildPortMenu ( void )
+{
+	int32 prevId = (connectedProducer != NULL) ? connectedProducer->ID() : -1;
+
+	if (connectedProducer != NULL) {
+		connectedProducer->Disconnect(theMidiMonitor);
+		connectedProducer->Release();
+		connectedProducer = NULL;
+	}
+
+	while (fPortMenu->CountItems() > 0)
+		delete fPortMenu->RemoveItem((int32)0);
+
+	int32 id = 0;
+	int32 count = 0;
+	int32 connectIdx = 0;
+	BMidiProducer *prod;
+	while ((prod = BMidiRoster::NextProducer(&id)) != NULL) {
+		BMenuItem *item = new BMenuItem ( prod->Name(),
+		                                  new BMessage ( MSG_MIDIMONITOR_MIDI_PORT ) );
+		item->Message()->AddInt32 ( "port_id", prod->ID() );
+		item->SetTarget(be_app);
+		fPortMenu->AddItem ( item );
+
+		// Re-select the same producer if still present, else fall through to first
+		if (connectedProducer == NULL &&
+		    (prod->ID() == prevId || prevId == -1)) {
+			connectedProducer = prod;
+			connectedProducer->Acquire();
+			connectIdx = count;
+		}
+
+		prod->Release();
+		count++;
+	}
+
+	if (count == 0) {
+		BMenuItem *noItem = new BMenuItem("No ports found", NULL);
+		noItem->SetEnabled(false);
+		fPortMenu->AddItem(noItem);
+	} else {
+		// Fall back to first entry if previous producer disappeared
+		if (connectedProducer == NULL) {
+			BMenuItem *first = fPortMenu->ItemAt(0);
+			if (first != NULL) {
+				connectedProducer = BMidiRoster::FindProducer(
+				    first->Message()->FindInt32("port_id"));
+				connectIdx = 0;
+			}
+		}
+		fPortMenu->SetRadioMode(TRUE);
+		BMenuItem *sel = fPortMenu->ItemAt(connectIdx);
+		if (sel != NULL)
+			sel->SetMarked(TRUE);
+		fPortMenu->SetTargetForItems(be_app);
+	}
+
+	if (connectedProducer != NULL)
+		connectedProducer->Connect(theMidiMonitor);
+}
 
 
 void
@@ -145,6 +182,10 @@ MidiMonitorApp::MessageReceived ( BMessage *msg )
 			}
 			break;
 		}
+		case 'MReg':   // B_MIDI_REGISTERED
+		case 'MUnr':   // B_MIDI_UNREGISTERED
+			_RebuildPortMenu();
+			break;
 		default:
 			BApplication::MessageReceived ( msg );
 			break;
@@ -152,12 +193,8 @@ MidiMonitorApp::MessageReceived ( BMessage *msg )
 }
 
 
-
-
-
 int main ( void ) {
 	MidiMonitorApp	app;
 	app.Run();
 	return 0;
 }
-	
