@@ -80,8 +80,7 @@ MidiMonitorApp::MidiMonitorApp ( void )
 
 MidiMonitorApp::~MidiMonitorApp ( void )
 {
-	BMessenger me(this);
-	BMidiRoster::StopWatching(&me);
+	BMidiRoster::StopWatching();
 
 	if (connectedProducer != NULL) {
 		connectedProducer->Disconnect(theMidiMonitor);
