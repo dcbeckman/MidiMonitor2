@@ -1,0 +1,171 @@
+Debug information for team /boot/home/MidiMonitor2/MidiMonitor (3668):
+CPU(s): 2x Intel Core
+Memory: 1,021.88 MiB total, 590.75 MiB used
+Haiku revision: hrev57937+113 Sep 12 2024 21:59 (BePC)
+
+Active Threads:
+	thread 3672: MidiRosterLooper 
+	thread 3679: team 3668 debug task 
+	thread 3668: MidiMonitor (main)
+		state: Call (you should use Release() to dispose of endpoints; do not "delete" them or allocate them on the stack!)
+
+		Frame		IP			Function Name
+		-----------------------------------------------
+		00000000	0x609ef112	commpage_syscall + 0x2 
+			Disassembly:
+				commpage_syscall:
+				0x609ef110:             89e1  mov %esp, %ecx
+				0x609ef112:             0f34  sysenter <--
+
+		0x730890e8	0x1a1e475	debugger + 0x39 
+		0x73089120	0x1d30668	_._13BMidiEndpoint + 0x30 
+		0x73089150	0x1d2fe53	_._13BMidiConsumer + 0x27 
+		0x73089180	0x1d30afe	_._18BMidiLocalConsumer + 0x5a 
+		0x730891b0	0x83617a	_._14M2BMidiMonitor + 0x1e 
+		0x730891e0	0x834776	_._14MidiMonitorApp + 0x7a 
+		0x73089340	0x834995	main + 0x35 
+		0x73089368	0x833d92	_start + 0x56 
+		0x730893a8	0xbd1736	runtime_loader + 0x132 
+		00000000	0x609ef250	commpage_thread_exit + 0 
+
+		Registers:
+			  eip:	0x609ef114
+			  esp:	0x730890ac
+			  ebp:	0x730890e8
+			  eax:	0x000000eb
+			  ebx:	0x01adedf4
+			  ecx:	0x730890ac
+			  edx:	0x609ef114
+			  esi:	0x01d34960
+			  edi:	0x00000003
+			   cs:	0x001b
+			   ds:	0x0023
+			   es:	0x0023
+			   fs:	0x0063
+			   gs:	0x0023
+			   ss:	0x0023
+			  st0:	nan
+			  st1:	nan
+			  st2:	280
+			  st3:	8.96e+04
+			  st4:	0
+			  st5:	320
+			  st6:	0
+			  st7:	1.78e+15
+			  mm0:	{0x1e1, 0, 0, 0}
+			  mm1:	{0xa7b1, 0, 0, 0}
+			  mm2:	{0, 0, 0, 0x8c00}
+			  mm3:	{0, 0, 0, 0xaf00}
+			  mm4:	{0, 0, 0, 0}
+			  mm5:	{0, 0, 0, 0xa000}
+			  mm6:	{0, 0, 0, 0}
+			  mm7:	{0x8000, 0xbd8, 0xa46b, 0xca74}
+			 xmm0:	{0, 0, 0, 0, 0, 0, 0, 0}
+			 xmm1:	{0, 0, 0, 0, 0, 0, 0, 0}
+			 xmm2:	{0, 0, 0, 0, 0, 0, 0, 0}
+			 xmm3:	{0, 0, 0, 0, 0, 0, 0, 0}
+			 xmm4:	{0, 0, 0, 0, 0, 0, 0, 0}
+			 xmm5:	{0, 0, 0, 0, 0, 0, 0, 0}
+			 xmm6:	{0, 0, 0, 0, 0, 0, 0, 0}
+			 xmm7:	{0, 0, 0, 0, 0, 0, 0, 0}
+
+Loaded Images:
+	ID		Text Base	Text End	Data Base	Data End	Type	Name
+	--------------------------------------------------------------------------------
+	22275	0x002e4000	0x00456000	0x00456000	0x0048a000	lib    	/boot/system/lib/libicuuc.so.57.2
+	22267	0x0082e000	0x00838000	0x00838000	0x0083b000	app    	/boot/home/MidiMonitor2/MidiMonitor
+	22277	0x009ac000	0x00a7f000	0x00a7f000	0x00a81000	lib    	/boot/system/lib/libzstd.so.1.5.6
+	22266	0x00bc0000	0x00bdc000	0x00bdc000	0x00bde000	lib    	/boot/system/runtime_loader
+	22279	0x00dc9000	0x00dd2000	0x00dd2000	0x00dd4000	add-on 	/boot/system/add-ons/locale/catalogs/plaintext
+	22273	0x0126a000	0x014fa000	0x014fa000	0x01564000	lib    	/boot/system/lib/libicui18n.so.57.2
+	22271	0x019f4000	0x01ad3000	0x01ad3000	0x01af0000	lib    	/boot/system/lib/libroot.so
+	22270	0x01ce8000	0x01d1a000	0x01d1a000	0x01d27000	lib    	/boot/system/lib/libstdc++.r4.so
+	22269	0x01d2a000	0x01d36000	0x01d36000	0x01d39000	lib    	/boot/system/lib/libmidi2.so
+	22268	0x01d53000	0x0203c000	0x0203c000	0x020d9000	lib    	/boot/system/lib/libbe.so
+	22276	0x02466000	0x02479000	0x02479000	0x0247c000	lib    	/boot/system/lib/libz.so.1.3.1
+	22274	0x024bc000	0x024c5000	0x024c5000	0x024c6000	lib    	/boot/system/lib/libicuio.so.57.2
+	22272	0x025b4000	0x03e34000	0x03e34000	0x03e35000	lib    	/boot/system/lib/libicudata.so.57.2
+	22265	0x609ef000	0x609f7000	0x00000000	0x00000000	system 	commpage
+
+Areas:
+	ID		Base		End			Size (KiB)	Protection	Locking			Name
+	--------------------------------------------------------------------------------
+	68608	0x002e4000	0x00456000	      1480	r-x        	none          	libicuuc.so.57.2_seg0ro
+	68609	0x00456000	0x00489000	       204	rw-        	none          	libicuuc.so.57.2_seg1rw
+	68610	0x00489000	0x0048a000	         4	rw-        	none          	libicuuc.so.57.2_seg2rw
+	68586	0x00491000	0x004a1000	        64	rw-        	none          	rld heap
+	68588	0x0082e000	0x00838000	        40	r-x        	none          	MidiMonitor_seg0ro
+	68589	0x00838000	0x0083b000	        12	rw-        	none          	MidiMonitor_seg1rw
+	68587	0x0083d000	0x0083e000	         4	rw-cS      	none          	_rld_debug_
+	68615	0x008e8000	0x008f0000	        32	rw-        	none          	rld heap
+	68616	0x008fb000	0x0090b000	        64	rw-        	none          	rld heap
+	68613	0x009ac000	0x00a7f000	       844	r-x        	none          	libzstd.so.1.5.6_seg0ro
+	68614	0x00a7f000	0x00a81000	         8	rw-        	none          	libzstd.so.1.5.6_seg1rw
+	68584	0x00bc0000	0x00bdc000	       112	r-x        	none          	runtime_loader_seg0ro
+	68585	0x00bdc000	0x00bde000	         8	rw-        	none          	runtime_loader_seg1rw
+	68620	0x00dc9000	0x00dd2000	        36	r-x        	none          	plaintext_seg0ro
+	68621	0x00dd2000	0x00dd4000	         8	rw-        	none          	plaintext_seg1rw
+	68603	0x0126a000	0x014fa000	      2624	r-x        	none          	libicui18n.so.57.2_seg0ro
+	68604	0x014fa000	0x01563000	       420	rw-        	none          	libicui18n.so.57.2_seg1rw
+	68605	0x01563000	0x01564000	         4	rw-        	none          	libicui18n.so.57.2_seg2rw
+	68598	0x019f4000	0x01ad3000	       892	r-x        	none          	libroot.so_seg0ro
+	68599	0x01ad3000	0x01ae7000	        80	rw-        	none          	libroot.so_seg1rw
+	68600	0x01ae7000	0x01af0000	        36	rw-        	none          	libroot.so_seg2rw
+	68595	0x01ce8000	0x01d1a000	       200	r-x        	none          	libstdc++.r4.so_seg0ro
+	68596	0x01d1a000	0x01d25000	        44	rw-        	none          	libstdc++.r4.so_seg1rw
+	68597	0x01d25000	0x01d27000	         8	rw-        	none          	libstdc++.r4.so_seg2rw
+	68593	0x01d2a000	0x01d36000	        48	r-x        	none          	libmidi2.so_seg0ro
+	68594	0x01d36000	0x01d39000	        12	rw-        	none          	libmidi2.so_seg1rw
+	68590	0x01d53000	0x0203c000	      2980	r-x        	none          	libbe.so_seg0ro
+	68591	0x0203c000	0x020d7000	       620	rw-        	none          	libbe.so_seg1rw
+	68592	0x020d7000	0x020d9000	         8	rw-        	none          	libbe.so_seg2rw
+	68611	0x02466000	0x02479000	        76	r-x        	none          	libz.so.1.3.1_seg0ro
+	68612	0x02479000	0x0247c000	        12	rw-        	none          	libz.so.1.3.1_seg1rw
+	68606	0x024bc000	0x024c5000	        36	r-x        	none          	libicuio.so.57.2_seg0ro
+	68607	0x024c5000	0x024c6000	         4	rw-        	none          	libicuio.so.57.2_seg1rw
+	68601	0x025b4000	0x03e34000	     25088	r-x        	none          	libicudata.so.57.2_seg0ro
+	68602	0x03e34000	0x03e35000	         4	rw-        	none          	libicudata.so.57.2_seg1rw
+	68617	0x18051000	0x180e1000	       576	rw-        	none          	heap
+	68580	0x60674000	0x60678000	        16	rw-k       	full          	user area
+	68583	0x609ef000	0x609f7000	        32	r-xSk      	full          	commpage
+	68626	0x609f7000	0x609f8000	         4	rw-cS      	none          	server_memory
+	68628	0x689f7000	0x68a70000	       484	rw-cS      	none          	server_memory
+	68632	0x70a21000	0x70a66000	       276	rw-s       	none          	MidiRosterLooper_3672_stack
+	68582	0x7208a000	0x7308b000	     16388	rw-s       	none          	MidiMonitor_3668_stack
+
+Protection Flags: r - read, w - write, x - execute, s - stack, o - overcommit, c - cloneable, S - shared, k - kernel
+
+Semaphores:
+	ID		Count	Last Holder	Name
+	------------------------------------------------------------
+	34452	    0	          0	some BBlockCache lock
+	34453	    0	          0	Catalog
+	34454	    0	          0	some BLocker
+	34455	    0	          0	some BLocker
+	34456	    0	          0	token space
+	34457	    0	       3678	BLooperList lock
+	34458	    0	          0	AppServerLink_sLock
+	34459	    0	          0	LocaleRosterData
+	34460	    0	          0	some BLocker
+	34461	    0	          0	BMessageQueue Lock
+	34462	    0	          0	AppLooperPort
+	34475	    0	          0	screen list
+	34476	    0	          0	clipboard
+	34477	    0	          0	width buffer
+	34481	    0	          0	BMessageQueue Lock
+	34482	    0	          0	MidiRosterLooper
+	34483	    0	       3668	InitLock
+	34487	    0	          0	some BLocker
+	34488	    0	          0	some BLocker
+	34489	    0	          0	some BLocker
+	34490	    0	          0	some BLocker
+	34491	    0	          0	some BLocker
+	34492	    0	          0	some BLocker
+	34493	    0	          0	some BLocker
+	34494	    0	          0	some BLocker
+	34495	    0	          0	some BLocker
+	34496	    0	          0	some BLocker
+	34497	    0	          0	some BLocker
+	34505	    0	          0	BMessageQueue Lock
+	34506	    0	          0	offscreen bitmap
+	34516	    0	          0	tool tip manager
