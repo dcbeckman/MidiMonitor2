@@ -1,6 +1,6 @@
 # Makefile for MidiMonitor (Haiku OS Midi2 Kit version)
 
-TARGET = MidiMonitor
+TARGET = MidiMonitor2
 SRCS = main.cpp MidiMonitor.cpp M2BWindow.cpp M2BView.cpp
 OBJS = $(SRCS:.cpp=.o)
 CC = g++

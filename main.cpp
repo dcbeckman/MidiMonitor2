@@ -33,7 +33,7 @@ class MidiMonitorApp : public BApplication {
 #define MSG_MIDIMONITOR_MIDI_PORT 'BUmp'
 
 MidiMonitorApp::MidiMonitorApp ( void ) 
-	: BApplication ("application/x-vnd.tebo-midimonitor")
+	: BApplication ("application/x-vnd.tebo-midimonitor2")
 {
 	BRect aRect;
 	BList windows;
@@ -116,7 +116,7 @@ MidiMonitorApp::~MidiMonitorApp ( void )
 		connectedProducer->Release();
 	}
 	theMidiMonitor->Unregister();
-	delete theMidiMonitor;
+	theMidiMonitor->Release();
 }
 
 

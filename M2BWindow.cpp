@@ -12,14 +12,14 @@
 #include "M2BWindow.h"
 
 M2BWindow::M2BWindow ( BRect frame )
-			: BWindow ( frame, "MidiMonitor", B_TITLED_WINDOW,
+			: BWindow ( frame, "MidiMonitor2", B_TITLED_WINDOW,
 			/* B_NOT_RESIZABLE | B_NOT_ZOOMABLE */ 0, 0 )
 {
 	SetPulseRate ( 50000 ); // 50 ms
 
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-		path.Append("MidiMonitor_settings");
+		path.Append("MidiMonitor2_settings");
 		BFile file(path.Path(), B_READ_ONLY);
 		BMessage settings;
 		if (settings.Unflatten(&file) == B_OK) {
@@ -36,7 +36,7 @@ bool M2BWindow::QuitRequested()
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-		path.Append("MidiMonitor_settings");
+		path.Append("MidiMonitor2_settings");
 		BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 		BMessage settings;
 		settings.AddRect("frame", Frame());
