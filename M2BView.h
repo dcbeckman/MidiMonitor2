@@ -18,7 +18,7 @@
 class M2BBitmapView : public BView {
 public:
 		M2BMidiMonitor	*midiMonitor;
-						M2BBitmapView ( BRect frame, char *name,
+						M2BBitmapView ( BRect frame, const char *name,
 									M2BMidiMonitor *midiMonitor,
 									float menuHeight = 0.0 );
 virtual	void			AttachedToWindow();
@@ -35,7 +35,7 @@ class M2BView : public BView {
 		M2BBitmapView	*theBitmapView;
 
 	public:
-								M2BView( BRect frame, char *name,
+								M2BView( BRect frame, const char *name,
 								M2BMidiMonitor *midiMonitor,
 								float menuHeight = 0.0 ); 
 		virtual	void			AttachedToWindow();
