@@ -48,8 +48,7 @@ MidiMonitorApp::MidiMonitorApp ( void )
 
 	aRect.Set(20, 100, 340, 400);
 	BWindow *aWindow = (BWindow *) new M2BWindow(aRect);
-	aRect.OffsetTo(B_ORIGIN);
-	BView *aView = (BView *) new M2BView(aRect, "M2BView",
+	BView *aView = (BView *) new M2BView(aWindow->Bounds(), "M2BView",
 					(M2BMidiMonitor*)theMidiMonitor, menuHeight);
 	aWindow->AddChild(aView);
 	aWindow->Show();
