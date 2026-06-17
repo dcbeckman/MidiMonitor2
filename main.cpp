@@ -44,7 +44,10 @@ MidiMonitorApp::MidiMonitorApp ( void )
 
 	connectedProducer = NULL;
 	theMidiMonitor = new M2BMidiMonitor ();
-	theMidiMonitor->Register();
+	// By not calling Register(), the consumer remains private.
+	// It won't show up in the system roster (so Patchbay can't connect other ports to it),
+	// but we can still programmatically connect it to any producer we select from the menu.
+	// theMidiMonitor->Register();
 
 	aRect.Set(20, 100, 340, 400);
 	BWindow *aWindow = (BWindow *) new M2BWindow(aRect);
