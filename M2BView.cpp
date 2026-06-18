@@ -14,7 +14,7 @@
 
 /**************************************************************/
 
-M2BBitmapView::M2BBitmapView ( BRect rect, char *name, 
+M2BBitmapView::M2BBitmapView ( BRect rect, const char *name, 
 								M2BMidiMonitor *monitor,
 								float menuHeight )
 				: BView ( rect, name, 
@@ -39,7 +39,7 @@ void M2BBitmapView::AttachedToWindow()
 
 /**************************************************************/
 
-M2BView::M2BView ( BRect rect, char *name, M2BMidiMonitor *monitor, float menuHeight )
+M2BView::M2BView ( BRect rect, const char *name, M2BMidiMonitor *monitor, float menuHeight )
 			: BView ( rect, name, B_FOLLOW_ALL, 
 			B_FULL_UPDATE_ON_RESIZE | 
 			B_WILL_DRAW | 
@@ -224,11 +224,11 @@ void M2BView::Pulse ()
 			bottom = top + height;
 			if ( firsttime ) {
 				toInvalidate = 
-							BRect (0, top, Frame().Width(), bottom-1);
+							BRect (0, top, width, bottom-1);
 				firsttime = FALSE;
 			} else
 				toInvalidate = toInvalidate |
-							BRect (0, top, Frame().Width(), bottom-1);
+							BRect (0, top, width, bottom-1);
 		}
 	}
 	if ( !firsttime )
