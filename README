@@ -32,3 +32,16 @@ R4 BeIDE projects for both PPC and Intel are still included.
 I know the original binaries worked in BeOS r5, but not sure 
 if the project files will help with compiling for r5.  I will
 find out soon, and update if necessary.
+
+## Icon and Resources
+
+The project includes resources compiled via Haiku's Resource Compiler (`rc`).
+- [MidiMonitor.iom](file:///c:/Users/David%20Beckman/repos/MidiMonitor2/MidiMonitor.iom): The source vector icon project file, editable in Icon-O-Matic.
+- [MidiMonitor.rdef](file:///c:/Users/David%20Beckman/repos/MidiMonitor2/MidiMonitor.rdef): The resource definition file.
+
+To update/compile the vector icon:
+1. Open `MidiMonitor.iom` in **Icon-O-Matic** on Haiku.
+2. Go to **File > Export**, select **HVIF RDef** format, and save.
+3. Open the exported text file, copy the hex string data block under `resource vector_icon`, and paste it into `MidiMonitor.rdef`.
+4. Run `make` to compile the app. The Makefile will automatically compile the `.rdef` resource file and link it to the `MidiMonitor2` binary.
+
