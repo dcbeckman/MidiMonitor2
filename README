@@ -43,5 +43,24 @@ To update/compile the vector icon:
 1. Open `MidiMonitor.iom` in **Icon-O-Matic** on Haiku.
 2. Go to **File > Export**, select **HVIF RDef** format, and save.
 3. Open the exported text file, copy the hex string data block under `resource vector_icon`, and paste it into `MidiMonitor.rdef`.
-4. Run `make` to compile the app. The Makefile will automatically compile the `.rdef` resource file and link it to the `MidiMonitor2` binary.
+4. Run `make` to compile the app. The Makefile will automatically compile the `.rdef` resource file and link it to the `MidiMonitor` binary.
+
+## Packaging (.hpkg)
+
+To build a native Haiku package (`.hpkg`):
+
+```bash
+make hpkg
+```
+
+Or run the build script directly:
+```bash
+chmod +x build_hpkg.sh
+./build_hpkg.sh
+```
+
+This compiles the binary and bundles it into `midimonitor-2.0.0-x86_64.hpkg` along with Deskbar menu integration (`Applications/MidiMonitor`).
+
+A HaikuPorts recipe file (`midimonitor-2.0.0.recipe`) is also included for building with `haikuporter`.
+
 

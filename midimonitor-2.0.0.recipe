@@ -1,0 +1,42 @@
+SUMMARY="MIDI monitoring application for Haiku"
+DESCRIPTION="MidiMonitor displays incoming MIDI messages from selected physical MIDI input ports. \
+Features real-time visual feedback based on message age using Haiku's MidiKit2 API."
+HOMEPAGE="https://github.com/dcbeckman/MidiMonitor2"
+COPYRIGHT="2026 David Beckman
+	1999 Bill Thibault"
+LICENSE="MIT"
+REVISION="1"
+SRC_URI="https://github.com/dcbeckman/MidiMonitor2/archive/refs/tags/v2.0.0.tar.gz"
+CHECKSUM_SHA256=""
+
+ARCHITECTURES="all !x86_gcc2"
+SECONDARY_ARCHITECTURES="x86"
+
+PROVIDES="
+	midimonitor$secondaryArchSuffix = $portVersion
+	app:MidiMonitor$secondaryArchSuffix = $portVersion
+	"
+REQUIRES="
+	haiku$secondaryArchSuffix
+	"
+
+BUILD_REQUIRES="
+	haiku${secondaryArchSuffix}_devel
+	"
+BUILD_PREREQUIRES="
+	makefile_engine
+	cmd:gcc$secondaryArchSuffix
+	cmd:make
+	"
+
+BUILD()
+{
+	make $jobArgs
+}
+
+INSTALL()
+{
+	mkdir -p $appsDir
+	cp objects.*/MidiMonitor $appsDir/MidiMonitor
+	addAppDeskbarSymlink $appsDir/MidiMonitor "MidiMonitor"
+}

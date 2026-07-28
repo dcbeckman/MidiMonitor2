@@ -1,2 +1,4 @@
 *.o
 MidiMonitor2
+MidiMonitor
+*.hpkg

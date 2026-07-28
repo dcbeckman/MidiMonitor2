@@ -1,0 +1,28 @@
+name midimonitor
+version 2.0.0-1
+architecture x86_64
+
+summary "MIDI monitoring application for Haiku"
+description "MidiMonitor displays incoming MIDI messages from selected physical MIDI input ports. \
+Features real-time visual feedback based on message age using Haiku's MidiKit2 API."
+
+packager "dcbeckman"
+vendor "Indispensable Labs"
+
+licenses {
+	"MIT"
+}
+
+copyrights {
+	"2026 David Beckman",
+	"1999 Bill Thibault"
+}
+
+provides {
+	midimonitor = 2.0.0-1
+	app:MidiMonitor = 2.0.0-1
+}
+
+requires {
+	haiku
+}

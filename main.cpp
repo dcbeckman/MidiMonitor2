@@ -36,7 +36,7 @@ class MidiMonitorApp : public BApplication {
 #define MSG_MIDIMONITOR_MIDI_PORT 'BUmp'
 
 MidiMonitorApp::MidiMonitorApp ( void )
-	: BApplication ("application/x-vnd.dcbeckman-midimonitor2")
+	: BApplication ("application/x-vnd.indi_labs-MidiMonitor")
 {
 	BRect aRect;
 	BList windows;

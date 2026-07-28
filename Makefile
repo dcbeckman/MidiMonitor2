@@ -5,7 +5,7 @@
 ## architecture of Haiku.
 
 # The name of the binary.
-NAME = MidiMonitor2
+NAME = MidiMonitor
 
 # The type of binary, must be one of:
 #	APP:	Application
@@ -15,7 +15,7 @@ NAME = MidiMonitor2
 TYPE = APP
 
 # 	If you plan to use localization, specify the application's MIME signature.
-APP_MIME_SIG = application/x-vnd.billthibault-MidiMonitor2
+APP_MIME_SIG = application/x-vnd.indi_labs-MidiMonitor
 
 #	The following lines tell Pe and Eddie where the SRCS, RDEFS, and RSRCS are
 #	so that Pe and Eddie can fill them in for you.
@@ -132,3 +132,8 @@ DRIVER_PATH =
 
 ## Include the Makefile-Engine
 include $(DEVEL_DIRECTORY)/etc/makefile-engine
+
+.PHONY: hpkg
+hpkg: default
+	./build_hpkg.sh
+

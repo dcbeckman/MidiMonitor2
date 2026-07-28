@@ -1,4 +1,4 @@
-resource app_signature "application/x-vnd.billthibault-MidiMonitor2";
+resource app_signature "application/x-vnd.indi_labs-MidiMonitor";
 
 resource app_flags B_SINGLE_LAUNCH;
 
@@ -8,8 +8,8 @@ resource app_version {
 	minor  = 0,
 	variety = 0, // B_APP_VERSION_STAGE_DEVELOPMENT
 	internal = 0,
-	short_info = "MidiMonitor2",
-	long_info = "MidiMonitor2 ©2026 David Beckman"
+	short_info = "MidiMonitor",
+	long_info = "MidiMonitor ©2026 David Beckman"
 };
 
 resource vector_icon {
