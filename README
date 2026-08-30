@@ -36,8 +36,8 @@ find out soon, and update if necessary.
 ## Icon and Resources
 
 The project includes resources compiled via Haiku's Resource Compiler (`rc`).
-- [MidiMonitor.iom](file:///c:/Users/David%20Beckman/repos/MidiMonitor2/MidiMonitor.iom): The source vector icon project file, editable in Icon-O-Matic.
-- [MidiMonitor.rdef](file:///c:/Users/David%20Beckman/repos/MidiMonitor2/MidiMonitor.rdef): The resource definition file.
+- [MidiMonitor.iom](MidiMonitor.iom): The source vector icon project file, editable in Icon-O-Matic.
+- [MidiMonitor.rdef](MidiMonitor.rdef): The resource definition file.
 
 To update/compile the vector icon:
 1. Open `MidiMonitor.iom` in **Icon-O-Matic** on Haiku.
@@ -45,22 +45,49 @@ To update/compile the vector icon:
 3. Open the exported text file, copy the hex string data block under `resource vector_icon`, and paste it into `MidiMonitor.rdef`.
 4. Run `make` to compile the app. The Makefile will automatically compile the `.rdef` resource file and link it to the `MidiMonitor` binary.
 
+## Installing
+
+MidiMonitor is published on the Indispensable Labs apps repository. On Haiku:
+
+```
+pkgman add-repo https://hpkg.indispensablelabs.com/apps/x86_64/current
+pkgman install midimonitor
+```
+
+x86_64 only for now. The sources are plain Be API C++98, so an x86_gcc2 build
+should work, but none has been made yet -- there is no 32-bit repository.
+
+Note that Haiku matches an existing repository by NAME, not by URL, so if the
+repository ever moves you must `pkgman drop-repo "Indispensable Labs"` before
+adding the new URL. `add-repo` alone prompts to overwrite and defaults to *no*.
+
 ## Packaging (.hpkg)
 
-To build a native Haiku package (`.hpkg`):
+Everything lives in [packaging/](packaging/) and all of it must run on Haiku
+except the last step. See the header comment in each script -- they carry the
+reasoning, this is only the running order.
 
-```bash
-make hpkg
+```
+packaging/build-package.sh    # clean build + .hpkg into packaging/out/
+packaging/build-repo.sh       # assemble the repository into packaging/out-repo/
+packaging/publish-repo.sh     # dry run; add --go to actually upload
 ```
 
-Or run the build script directly:
-```bash
-chmod +x build_hpkg.sh
-./build_hpkg.sh
-```
+`make hpkg` is a shortcut for the first step alone.
 
-This compiles the binary and bundles it into `midimonitor-2.0.0-x86_64.hpkg` along with Deskbar menu integration (`Applications/MidiMonitor`).
+`publish-repo.sh` runs where rclone is configured (WSL), not on Haiku, so copy
+`out-repo/` off the Haiku box first.
 
-A HaikuPorts recipe file (`midimonitor-2.0.0.recipe`) is also included for building with `haikuporter`.
+**The repository is shared.** Beton is published to the same index, and
+`package_repo create` writes a new index rather than amending one -- so
+`build-repo.sh` downloads the live index, verifies every package it names
+against the checksum recorded there, and re-indexes those alongside the local
+build. Publishing MidiMonitor therefore republishes Beton unchanged. Two files
+are duplicated verbatim in both repositories and must be kept byte-identical:
+`packaging/repo-info.in` and `packaging/build-repo.sh`.
+
+A HaikuPorts recipe (`midimonitor-2.0.1.recipe`) is included for a future
+submission, but it is not what gets published and it does not build yet -- it
+needs a release tag and a checksum first. Its header says so in detail.
 
 

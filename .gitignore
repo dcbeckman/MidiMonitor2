@@ -2,3 +2,7 @@
 MidiMonitor2
 MidiMonitor
 *.hpkg
+objects.*/
+packaging/out/
+packaging/out-repo/
+packaging/.stage-*

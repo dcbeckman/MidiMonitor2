@@ -1,0 +1,71 @@
+# MidiMonitor -- HaikuPorts recipe.
+#
+# ⚠️ THIS IS NOT WHAT WE PUBLISH, AND IT DOES NOT BUILD YET.
+#
+# The package on the Indispensable Labs repository is built by
+# packaging/build-package.sh from the working tree. This recipe exists for a
+# future HaikuPorts submission, which must build a released TARBALL instead.
+# Two things are missing before it can do that (both true as of 2026-08-29):
+#
+#   1. There is no v2.0.1 tag. `git ls-remote --tags origin` returns nothing,
+#      so the SRC_URI below 404s.
+#   2. CHECKSUM_SHA256 is therefore empty, and haikuporter refuses a recipe
+#      with no checksum.
+#
+# Tag the release, fetch the tarball, and paste its sha256 here before using
+# this. Until then the two paths cannot be compared, so treat any claim that
+# "the recipe and the published package agree" as unverified.
+
+SUMMARY="A MIDI input monitor"
+DESCRIPTION="MidiMonitor displays incoming MIDI messages from a selected physical MIDI \
+input port, using Haiku's MidiKit2. The colour a message is drawn in is based on its age: \
+new messages in bright green, fading to black as they age. Adapted from Bill Thibault's \
+BeOS R4 MidiMonitor 1.0."
+HOMEPAGE="https://github.com/dcbeckman/MidiMonitor2"
+COPYRIGHT="2026 David Beckman
+	1999 Bill Thibault"
+LICENSE="MIT"
+REVISION="1"
+SRC_URI="https://github.com/dcbeckman/MidiMonitor2/archive/refs/tags/v2.0.1.tar.gz"
+CHECKSUM_SHA256=""
+
+# NOT "all !x86_gcc2". The earlier revision of this recipe carried Beton's
+# exclusion, copied across without cause: Beton is C++17 and genuinely cannot
+# build under gcc 2.95, whereas MidiMonitor is plain Be API C++ with no STL, no
+# exceptions and no C++11 (see the include list in the sources), which is
+# exactly what gcc2 still compiles.
+#
+# ⚠️ Expected, not verified. The 32-bit box was offline on 2026-08-29 and no
+# gcc2 build of this has ever been run. If a submission is made before one is,
+# say so -- do not let this comment stand in for a build.
+ARCHITECTURES="all"
+SECONDARY_ARCHITECTURES="x86"
+
+PROVIDES="
+	midimonitor$secondaryArchSuffix = $portVersion
+	app:MidiMonitor$secondaryArchSuffix = $portVersion
+	"
+REQUIRES="
+	haiku$secondaryArchSuffix
+	"
+
+BUILD_REQUIRES="
+	haiku${secondaryArchSuffix}_devel
+	"
+BUILD_PREREQUIRES="
+	makefile_engine
+	cmd:gcc$secondaryArchSuffix
+	cmd:make
+	"
+
+BUILD()
+{
+	make $jobArgs
+}
+
+INSTALL()
+{
+	mkdir -p $appsDir
+	cp objects.*/MidiMonitor $appsDir/MidiMonitor
+	addAppDeskbarSymlink $appsDir/MidiMonitor "MidiMonitor"
+}

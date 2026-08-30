@@ -1,0 +1,86 @@
+# MidiMonitor -- .PackageInfo template.
+#
+# @VERSION@, @VERSION_BASE@ and @ARCH@ are substituted by
+# packaging/build-package.sh.
+#
+# The `requires` below were read from the binary we actually linked, with
+# `readelf -d objects.*/MidiMonitor` on hrev59866+79 (2026-08-29). That binary
+# NEEDs exactly four libraries:
+#
+#     libbe.so  libmidi2.so  libroot.so  libgcc_s.so.1
+#
+# The first three are provided by the `haiku` package itself, so `requires
+# haiku` covers them and there is no lib: line for them -- adding one would be
+# noise, not safety. libgcc_s comes from gcc_syslibs; `haiku` already declares
+# `lib:libgcc_s>=1` itself, so this is belt-and-braces, but it is what the
+# binary links and stating it is what makes the dependency auditable from the
+# package rather than from a transitive requirement.
+#
+# ⚠️ There is deliberately NO lib:libstdc++ line, and that is not an oversight.
+# Beton needs one; this does not. MidiMonitor is plain Be API C++ with no STL
+# and no iostreams (see the include list in the sources), and Haiku's libroot
+# exports the operator new/delete it does use -- so libstdc++.so never appears
+# in NEEDED. If a future change pulls in <string>, <vector> or streams, the
+# link will start needing it and this file must gain `lib:libstdc++ >= 6`.
+# Re-read `readelf -d` on the built binary; never assume this list still holds.
+
+name			midimonitor
+version			@VERSION@
+architecture	@ARCH@
+
+summary			"A MIDI input monitor"
+
+description		"MidiMonitor displays incoming MIDI messages from a selected \
+physical MIDI input port, using Haiku's MidiKit2.
+
+The colour a message is drawn in is based on its age: new messages in bright \
+green, fading to black as they age. Often just seeing the flash of an arriving \
+message -- from across the room, say -- is all the confirmation you need that a \
+device is sending. The incoming stream is sampled at the pulse rate (20 Hz) and \
+only the most recent message is shown, so it keeps up with the densest MIDI \
+streams without being swamped.
+
+Adapted from Bill Thibault's BeOS R4 MidiMonitor 1.0, converted from the \
+original MidiKit to MidiKit2."
+
+packager		"David Beckman <indispensablelabs@gmail.com>"
+
+# Must match the `vendor` in repo-info.in or package_repo refuses the build
+# (RepositoryWriterImpl.cpp:405-410). This is the PACKAGER, not the author --
+# see copyrights, which credits Bill Thibault's original alongside this work.
+vendor			"Indispensable Labs"
+
+# ⚠️ NO COMMAS between list items. A .PackageInfo list is separated by newlines
+# or ';' and NOTHING else -- BPackageInfo::Parser::_NextToken
+# (PackageInfoParser.cpp:159-190) recognises only those two as
+# TOKEN_ITEM_SEPARATOR, and the unquoted-segment switch at :263-290 does not
+# treat ',' as a terminator, so a trailing comma is simply appended to the
+# string it follows.
+#
+# This is silent. The superseded root PackageInfo (commit 27d9537) wrote
+# `"2026 David Beckman",` and `package create` accepted it happily; the built
+# package listed `copyright: 2026 David Beckman,` -- comma included -- which
+# would have gone out to users that way. Caught 2026-08-29 by diffing the
+# output against a stock package (bepdf, five copyrights, no commas).
+copyrights {
+	"2026 David Beckman"
+	"1999 Bill Thibault"
+}
+
+licenses {
+	"MIT"
+}
+
+# The provides use @VERSION_BASE@ (2.0.1), not @VERSION@ (2.0.1-1): the
+# revision counts OUR packaging iterations and is not part of the software's
+# version, so `pkgman install midimonitor` and any future `requires
+# midimonitor >= 2.0.1` resolve against the upstream number.
+provides {
+	midimonitor = @VERSION_BASE@
+	app:MidiMonitor = @VERSION_BASE@
+}
+
+requires {
+	haiku >= r1~beta6
+	lib:libgcc_s >= 1
+}

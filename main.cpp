@@ -25,9 +25,11 @@ class MidiMonitorApp : public BApplication {
 	public:
 				MidiMonitorApp ( void );
 				~MidiMonitorApp ( void );
+		virtual void ReadyToRun ( void );
 		virtual void MessageReceived ( BMessage *msg );
 	private:
 		void         _RebuildPortMenu ( void );
+		BWindow      *fWindow;
 		BMenu        *fPortMenu;
 		BMidiProducer	*connectedProducer;
 		M2BMidiMonitor	*theMidiMonitor;
@@ -35,14 +37,44 @@ class MidiMonitorApp : public BApplication {
 
 #define MSG_MIDIMONITOR_MIDI_PORT 'BUmp'
 
+// ⚠️ NOTHING MIDI- OR WINDOW-RELATED BELONGS IN THIS CONSTRUCTOR.
+//
+// It runs before BApplication::Run(), so the app's message loop is not yet
+// servicing messages. Any midi_server round trip made here -- constructing a
+// BMidiLocalConsumer, walking BMidiRoster, StartWatching() -- blocks the main
+// thread waiting for a reply that only the loop it is blocking can deliver.
+//
+// This is not hypothetical. Version 2.0.0-1 did all of it here and hung on
+// launch on hrev59866+79 (2026-08-29): the team came up with exactly three
+// threads -- main in `wait`, MidiEventThread, MidiRosterLooper -- and NO `w>`
+// window thread, because execution never reached Show(). With B_SINGLE_LAUNCH
+// in MidiMonitor.rdef, every later launch was then handed off to that hung
+// instance, so the app looked permanently dead with no error anywhere.
+//
+// Do the work in ReadyToRun() instead. See haiku-agent-gotchas.md section 4.
 MidiMonitorApp::MidiMonitorApp ( void )
-	: BApplication ("application/x-vnd.indi_labs-MidiMonitor")
+	: BApplication ("application/x-vnd.indi_labs-MidiMonitor"),
+	  fWindow ( NULL ),
+	  fPortMenu ( NULL ),
+	  connectedProducer ( NULL ),
+	  theMidiMonitor ( NULL )
+{
+}
+
+
+void
+MidiMonitorApp::ReadyToRun ( void )
 {
 	BRect aRect;
-	BList windows;
 	const float menuHeight = 20;
 
-	connectedProducer = NULL;
+	// Guard against a second initialisation. A relaunch of a B_SINGLE_LAUNCH
+	// app is delivered as B_SILENT_RELAUNCH, and BApplication's default
+	// handler calls ReadyToRun() again -- which without this would build a
+	// second window and a second consumer over the top of the first.
+	if ( fWindow != NULL )
+		return;
+
 	theMidiMonitor = new M2BMidiMonitor ();
 	// By not calling Register(), the consumer remains private.
 	// It won't show up in the system roster (so Patchbay can't connect other ports to it),
@@ -50,12 +82,10 @@ MidiMonitorApp::MidiMonitorApp ( void )
 	// theMidiMonitor->Register();
 
 	aRect.Set(20, 100, 340, 400);
-	BWindow *aWindow = (BWindow *) new M2BWindow(aRect);
-	BView *aView = (BView *) new M2BView(aWindow->Bounds(), "M2BView",
+	fWindow = (BWindow *) new M2BWindow(aRect);
+	BView *aView = (BView *) new M2BView(fWindow->Bounds(), "M2BView",
 					(M2BMidiMonitor*)theMidiMonitor, menuHeight);
-	aWindow->AddChild(aView);
-	aWindow->Show();
-	windows.AddItem ( aWindow );
+	fWindow->AddChild(aView);
 
 	aRect.Set ( 0,0,1000,menuHeight);
 	BMenuBar	*menubar = new BMenuBar ( aRect, "menubar" );
@@ -74,6 +104,11 @@ MidiMonitorApp::MidiMonitorApp ( void )
 
 	_RebuildPortMenu();
 
+	// Show() last, once the whole view hierarchy is built. Before this point
+	// the window has no thread of its own, so everything above runs
+	// unsynchronised on the main thread rather than racing the window thread.
+	fWindow->Show();
+
 	// Watch for endpoints being added/removed so the Port menu stays current
 	BMessenger me(this);
 	BMidiRoster::StartWatching(&me);
@@ -82,6 +117,11 @@ MidiMonitorApp::MidiMonitorApp ( void )
 
 MidiMonitorApp::~MidiMonitorApp ( void )
 {
+	// ReadyToRun() may never have run (an early quit), so nothing here may
+	// assume the MIDI objects exist.
+	if (theMidiMonitor == NULL)
+		return;
+
 	BMidiRoster::StopWatching();
 
 	if (connectedProducer != NULL) {
@@ -93,6 +133,7 @@ MidiMonitorApp::~MidiMonitorApp ( void )
 	// Release() or the endpoint refcount double-dips and the destructor fires
 	// debugger("you should use Release()...").
 	theMidiMonitor->Release();
+	theMidiMonitor = NULL;
 }
 
 
@@ -185,7 +226,21 @@ MidiMonitorApp::MessageReceived ( BMessage *msg )
 		}
 		case 'MReg':   // B_MIDI_REGISTERED
 		case 'MUnr':   // B_MIDI_UNREGISTERED
-			_RebuildPortMenu();
+			// Endpoint churn can arrive before ReadyToRun() has built the
+			// menu; there is nothing to rebuild yet if so.
+			if (fPortMenu != NULL)
+				_RebuildPortMenu();
+			break;
+
+		// A relaunch of a B_SINGLE_LAUNCH app (MidiMonitor.rdef) arrives here
+		// rather than starting a second instance. Bring the existing window
+		// forward -- otherwise clicking the Deskbar entry of an already-running
+		// MidiMonitor appears to do nothing at all.
+		case B_SILENT_RELAUNCH:
+			if (fWindow != NULL && fWindow->Lock()) {
+				fWindow->Activate(true);
+				fWindow->Unlock();
+			}
 			break;
 		default:
 			BApplication::MessageReceived ( msg );

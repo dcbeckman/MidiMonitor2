@@ -133,7 +133,10 @@ DRIVER_PATH =
 ## Include the Makefile-Engine
 include $(DEVEL_DIRECTORY)/etc/makefile-engine
 
+# Build the .hpkg into packaging/out/. No dependency on `default` on purpose:
+# build-package.sh does its own clean build, because a package assembled from
+# whatever objects happened to be lying around is not reproducible.
 .PHONY: hpkg
-hpkg: default
-	./build_hpkg.sh
+hpkg:
+	packaging/build-package.sh
 
