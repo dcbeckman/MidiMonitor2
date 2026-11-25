@@ -138,9 +138,24 @@ sed -e "s|@VERSION@|$VERSION|g" \
     "$PKGDIR/$(echo $APPNAME | tr 'A-Z' 'a-z').PackageInfo.in" \
     > "$STAGE/.PackageInfo"
 
+# A gcc2 build is named midimonitor_x86_gcc2: the 32-bit apps repository
+# requires every package name to end in _x86 or _x86_gcc2, so the compiler is
+# visible at a glance (its build-repo.sh refuses anything else). It also drops
+# lib:libgcc_s, which a gcc2 binary does not link and which nothing on a 32-bit
+# Haiku provides -- left in, the package could never be installed. Checked
+# 2026-11-25 against a gcc 2.95.3 cross-build: NEEDED is libbe, libmidi2,
+# libstdc++.r4 and libroot, all in the haiku package.
+PKGNAME=midimonitor
+if [ "$ARCH" = x86_gcc2 ]; then
+	PKGNAME=midimonitor_x86_gcc2
+	sed -i -e 's/^name\t\t\tmidimonitor$/name\t\t\tmidimonitor_x86_gcc2/' \
+	       -e 's/^\tmidimonitor = /\tmidimonitor_x86_gcc2 = /' \
+	       -e '/^\tlib:libgcc_s /d' "$STAGE/.PackageInfo"
+fi
+
 # --- create ----------------------------------------------------------------
 mkdir -p "$OUTDIR"
-PKGFILE="$OUTDIR/midimonitor-$VERSION-$ARCH.hpkg"
+PKGFILE="$OUTDIR/$PKGNAME-$VERSION-$ARCH.hpkg"
 rm -f "$PKGFILE"
 ( cd "$STAGE" && package create -q "$PKGFILE" )
 [ -f "$PKGFILE" ] || { echo "ERROR: package create produced nothing" >&2; exit 1; }
