@@ -78,7 +78,10 @@ summary			"Native Haiku applications packaged by Indispensable Labs. Ordinary us
 # package with `requires { haiku >= ... }`, which is where Haiku actually
 # enforces it; nothing in the package kit parses the base URL
 # (RepositoryConfig.cpp:265 only ever appends "/packages" to it).
-identifier		tag:indispensablelabs.com,2026:repositories/apps/@ARCH@
+#
+# @REPODIR@ is the URL directory, not always the architecture: the 32-bit
+# repository (architecture x86_gcc2) lives in `x86_32` -- see build-repo.sh.
+identifier		tag:indispensablelabs.com,2026:repositories/apps/@REPODIR@
 
 baseurl			@BASEURL@
 

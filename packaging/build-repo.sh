@@ -93,7 +93,20 @@ case "$(uname -m)" in
 		;;
 	*)	ARCH=$(uname -m) ;;
 esac
-BASEURL="$BASEURL_ROOT/$ARCH/current"
+
+# The URL directory is NOT always the architecture. The 32-bit repository is
+# declared x86_gcc2 -- the only architecture pkgman on a 32-bit (hybrid) Haiku
+# accepts -- but it carries apps built with gcc2 AND apps built for the x86
+# secondary architecture, so its directory is `x86_32`, which names neither.
+# Nothing in Haiku parses the base URL, so the two may differ. Set 2026-11-25,
+# when the repository was a few hours old and had no subscribers; changing it
+# again costs every subscriber a drop-repo/add-repo. Must stay in step with the
+# same mapping in publish-repo.sh.
+case "$ARCH" in
+	x86_gcc2)	REPODIR=x86_32 ;;
+	*)			REPODIR=$ARCH ;;
+esac
+BASEURL="$BASEURL_ROOT/$REPODIR/current"
 
 if [ ! -d "$INDIR" ] || [ -z "$(ls "$INDIR"/*.hpkg 2>/dev/null)" ]; then
 	echo "ERROR: no .hpkg files in $INDIR -- run build-package.sh first." >&2
@@ -132,6 +145,22 @@ stage_package() {
 		*)	echo "ERROR: $base -- filename arch disagrees with declared '$declared'" >&2
 			exit 1 ;;
 	esac
+
+	# In the 32-bit repository every package NAME says which compiler built
+	# it: `_x86` (the x86 secondary architecture, modern gcc) or `_x86_gcc2`
+	# (gcc2). The declared architecture is x86_gcc2 for both kinds, and so is
+	# every filename's suffix, so neither of those can tell them apart -- the
+	# name is the only place left. Set 2026-11-25 at David's request.
+	if [ "$ARCH" = x86_gcc2 ]; then
+		pname=$(package list -i "$p" 2>/dev/null \
+			| sed -n 's/^[[:space:]]*name:[[:space:]]*//p' | head -1)
+		case "$pname" in
+			*_x86|*_x86_gcc2) ;;
+			*)	echo "ERROR: $base -- package name '$pname' must end in _x86" \
+					"(x86 secondary architecture) or _x86_gcc2 (gcc2)" >&2
+				exit 1 ;;
+		esac
+	fi
 
 	# The repository's vendor and every package's vendor must agree or
 	# package_repo refuses the whole build. Checking here names the package.
@@ -261,6 +290,7 @@ echo
 
 # --- index -----------------------------------------------------------------
 sed -e "s|@BASEURL@|$BASEURL|g" \
+    -e "s|@REPODIR@|$REPODIR|g" \
     -e "s|@ARCH@|$ARCH|g" \
     "$PKGDIR/repo-info.in" > "$OUTDIR/repo.info"
 

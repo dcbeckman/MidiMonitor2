@@ -83,7 +83,13 @@ command -v rclone >/dev/null 2>&1 || { echo "ERROR: rclone not found." >&2; exit
 # this script runs on Linux, where uname -m says nothing about what was built.
 ARCH=$(awk '$1 == "architecture" { print $2 }' "$SRC/repo.info" | tr -d '"')
 [ -n "$ARCH" ] || { echo "ERROR: no architecture in $SRC/repo.info" >&2; exit 1; }
-URL_PATH=$(echo "$URL_PATH" | sed "s|@ARCH@|$ARCH|")
+# The URL directory for an architecture: the same mapping as build-repo.sh
+# (the 32-bit repository, declared x86_gcc2, lives in `x86_32`).
+case "$ARCH" in
+	x86_gcc2)	REPODIR=x86_32 ;;
+	*)			REPODIR=$ARCH ;;
+esac
+URL_PATH=$(echo "$URL_PATH" | sed "s|@ARCH@|$REPODIR|")
 BASEURL="$BASEURL_HOST/$URL_PATH"
 DEST="$RCLONE_REMOTE:$BUCKET/$URL_PATH"
 
